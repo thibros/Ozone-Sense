@@ -4,7 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Wind, Box, Clock, ShieldCheck, AlertTriangle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Wind, Box, Clock, ShieldCheck, AlertTriangle, RotateCcw } from "lucide-react";
 
 interface ParameterFormProps {
   volume: number;
@@ -17,6 +18,7 @@ interface ParameterFormProps {
   setSafeLimit: (s: number) => void;
   dangerousLimit: number;
   setDangerousLimit: (d: number) => void;
+  onReset: () => void;
 }
 
 // Ozone (O3) Molecular weight = 48
@@ -34,14 +36,24 @@ export function ParameterForm({
   setSafeLimit,
   dangerousLimit,
   setDangerousLimit,
+  onReset,
 }: ParameterFormProps) {
   return (
-    <Card className="shadow-lg border-none bg-white/50 backdrop-blur-sm">
-      <CardHeader>
+    <Card className="shadow-lg border-none bg-white/50 backdrop-blur-sm h-full">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0">
         <CardTitle className="flex items-center gap-2 text-primary font-headline">
           <Wind className="w-5 h-5 text-accent" />
           Environment Parameters
         </CardTitle>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={onReset}
+          className="h-8 text-xs text-muted-foreground hover:text-primary transition-colors"
+        >
+          <RotateCcw className="w-3 h-3 mr-1.5" />
+          Use Defaults
+        </Button>
       </CardHeader>
       <CardContent className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         <div className="space-y-2">

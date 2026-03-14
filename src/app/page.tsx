@@ -1,23 +1,68 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { ParameterForm } from "@/components/ozone-sense/parameter-form";
 import { ScheduleManager } from "@/components/ozone-sense/schedule-manager";
 import { ConcentrationChart } from "@/components/ozone-sense/concentration-chart";
 import { ConcentrationTable } from "@/components/ozone-sense/concentration-table";
 import { simulateOzone, ScheduleItem } from "@/lib/ozone-logic";
-import { Shield, Info } from "lucide-react";
+import { Shield, Info, RotateCcw } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+const DEFAULTS = {
+  volume: 50,
+  rate: 15000,
+  halfLife: 30,
+  safeLimit: 0.2,
+  dangerousLimit: 5.0,
+  schedule: [] as ScheduleItem[],
+};
 
 export default function Home() {
-  const [volume, setVolume] = useState(50);
-  const [rate, setRate] = useState(15000);
-  const [halfLife, setHalfLife] = useState(30);
-  const [safeLimit, setSafeLimit] = useState(0.2);
-  const [dangerousLimit, setDangerousLimit] = useState(5.0);
-  const [schedule, setSchedule] = useState<ScheduleItem[]>([]);
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [volume, setVolume] = useState(DEFAULTS.volume);
+  const [rate, setRate] = useState(DEFAULTS.rate);
+  const [halfLife, setHalfLife] = useState(DEFAULTS.halfLife);
+  const [safeLimit, setSafeLimit] = useState(DEFAULTS.safeLimit);
+  const [dangerousLimit, setDangerousLimit] = useState(DEFAULTS.dangerousLimit);
+  const [schedule, setSchedule] = useState<ScheduleItem[]>(DEFAULTS.schedule);
+
+  // Load from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem("ozonesense-settings");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed.volume !== undefined) setVolume(parsed.volume);
+        if (parsed.rate !== undefined) setRate(parsed.rate);
+        if (parsed.halfLife !== undefined) setHalfLife(parsed.halfLife);
+        if (parsed.safeLimit !== undefined) setSafeLimit(parsed.safeLimit);
+        if (parsed.dangerousLimit !== undefined) setDangerousLimit(parsed.dangerousLimit);
+        if (parsed.schedule !== undefined) setSchedule(parsed.schedule);
+      } catch (e) {
+        console.error("Failed to parse saved settings", e);
+      }
+    }
+    setIsInitialized(true);
+  }, []);
+
+  // Save to localStorage whenever values change
+  useEffect(() => {
+    if (!isInitialized) return;
+    const settings = { volume, rate, halfLife, safeLimit, dangerousLimit, schedule };
+    localStorage.setItem("ozonesense-settings", JSON.stringify(settings));
+  }, [volume, rate, halfLife, safeLimit, dangerousLimit, schedule, isInitialized]);
+
+  const handleReset = () => {
+    setVolume(DEFAULTS.volume);
+    setRate(DEFAULTS.rate);
+    setHalfLife(DEFAULTS.halfLife);
+    setSafeLimit(DEFAULTS.safeLimit);
+    setDangerousLimit(DEFAULTS.dangerousLimit);
+    setSchedule(DEFAULTS.schedule);
+  };
 
   const results = useMemo(() => {
-    // Simulation still runs internally on minutes for precision
     return simulateOzone(volume, rate, halfLife, safeLimit, schedule);
   }, [volume, rate, halfLife, safeLimit, schedule]);
 
@@ -35,9 +80,20 @@ export default function Home() {
               Precise environmental ozone concentration modeling
             </p>
           </div>
-          <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm border border-primary/5">
-            <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-            <span className="text-sm font-medium text-primary/80">Active Simulation Engine</span>
+          <div className="flex items-center gap-3">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleReset}
+              className="rounded-full border-primary/20 hover:bg-primary/5 text-primary/70"
+            >
+              <RotateCcw className="w-4 h-4 mr-2" />
+              Reset Defaults
+            </Button>
+            <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm border border-primary/5">
+              <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+              <span className="text-sm font-medium text-primary/80">Simulation Active</span>
+            </div>
           </div>
         </header>
 
@@ -55,6 +111,7 @@ export default function Home() {
               setSafeLimit={setSafeLimit}
               dangerousLimit={dangerousLimit}
               setDangerousLimit={setDangerousLimit}
+              onReset={handleReset}
             />
           </div>
           <div className="lg:col-span-4">
@@ -65,7 +122,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Visualization section - Now full width stacking */}
+        {/* Visualization section */}
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
           <div className="flex items-center gap-2 mb-2">
              <div className="h-px bg-primary/10 flex-1" />
