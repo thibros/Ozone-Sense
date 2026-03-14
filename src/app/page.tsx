@@ -123,26 +123,28 @@ export default function Home() {
         </section>
 
         {/* Visualization section */}
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <div className="flex items-center gap-2 mb-2">
-             <div className="h-px bg-primary/10 flex-1" />
-             <span className="text-xs font-bold text-primary/40 uppercase tracking-widest">Analysis Results</span>
-             <div className="h-px bg-primary/10 flex-1" />
-          </div>
+        {schedule.length > 0 && (
+          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className="flex items-center gap-2 mb-2">
+               <div className="h-px bg-primary/10 flex-1" />
+               <span className="text-xs font-bold text-primary/40 uppercase tracking-widest">Analysis Results</span>
+               <div className="h-px bg-primary/10 flex-1" />
+            </div>
 
-          <section className="space-y-8">
-            <ConcentrationChart 
-              data={results} 
-              safeLimit={safeLimit} 
-              dangerousLimit={dangerousLimit}
-            />
-            <ConcentrationTable 
-              data={results} 
-              safeLimit={safeLimit} 
-              dangerousLimit={dangerousLimit}
-            />
-          </section>
-        </div>
+            <section className="space-y-8">
+              <ConcentrationChart 
+                data={results} 
+                safeLimit={safeLimit} 
+                dangerousLimit={dangerousLimit}
+              />
+              <ConcentrationTable 
+                data={results} 
+                safeLimit={safeLimit} 
+                dangerousLimit={dangerousLimit}
+              />
+            </section>
+          </div>
+        )}
 
         {/* Footer / Info */}
         <footer className="pt-12 text-center border-t border-primary/5">
