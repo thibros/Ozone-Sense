@@ -50,7 +50,8 @@ export function ScheduleManager({ schedule, setSchedule }: ScheduleManagerProps)
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Duration (min)</Label>
             <Input
               type="number"
-              min={1}
+              min={5}
+              step={5}
               max={180 - totalDuration}
               value={nextDuration}
               onChange={(e) => setNextDuration(Number(e.target.value))}
