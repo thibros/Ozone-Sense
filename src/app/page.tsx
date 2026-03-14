@@ -69,7 +69,7 @@ export default function Home() {
              <div className="h-px bg-primary/10 flex-1" />
           </div>
 
-          <section className="grid gap-6 lg:grid-cols-2">
+          <section className="flex flex-col gap-8">
             <ConcentrationChart data={results} safeLimit={safeLimit} />
             <ConcentrationTable data={results} safeLimit={safeLimit} />
           </section>
@@ -78,8 +78,10 @@ export default function Home() {
         {/* Footer / Info */}
         <footer className="pt-12 text-center border-t border-primary/5">
           <p className="text-muted-foreground text-sm flex items-center justify-center gap-1.5">
-            <Info className="w-4 h-4" />
-            Ozone calculation assumes uniform distribution in the specified volume.
+            <span className="flex items-center gap-1.5">
+              <Info className="w-4 h-4 shrink-0" />
+              Ozone calculation assumes uniform distribution in the specified volume.
+            </span>
           </p>
           <p className="text-xs text-muted-foreground/60 mt-2">
             © {new Date().getFullYear()} OzoneSense Environmental Analytics

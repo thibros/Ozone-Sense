@@ -1,8 +1,6 @@
 "use client";
 
 import {
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -23,7 +21,7 @@ interface ConcentrationChartProps {
 
 export function ConcentrationChart({ data, safeLimit }: ConcentrationChartProps) {
   const chartData = data.map((d) => ({
-    time: d.time,
+    timeHours: parseFloat((d.time / 60).toFixed(2)),
     concentration: parseFloat(d.concentration.toFixed(3)),
     active: d.active ? 1 : 0,
   }));
@@ -48,8 +46,8 @@ export function ConcentrationChart({ data, safeLimit }: ConcentrationChartProps)
               </defs>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted))" />
               <XAxis 
-                dataKey="time" 
-                label={{ value: 'Time (min)', position: 'insideBottomRight', offset: -10 }}
+                dataKey="timeHours" 
+                label={{ value: 'Time (hours)', position: 'insideBottomRight', offset: -10 }}
                 tick={{ fontSize: 12 }}
               />
               <YAxis 
@@ -58,7 +56,7 @@ export function ConcentrationChart({ data, safeLimit }: ConcentrationChartProps)
               />
               <Tooltip 
                 formatter={(value: number) => [`${value} mg/m³`, 'Concentration']}
-                labelFormatter={(label) => `Time: ${label} min`}
+                labelFormatter={(label) => `Time: ${label} h`}
                 contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
               />
               <ReferenceLine y={safeLimit} label="Safe Limit" stroke="hsl(var(--destructive))" strokeDasharray="3 3" />
