@@ -1,14 +1,26 @@
-import type {NextConfig} from 'next';
+import type { NextConfig } from 'next';
+
+// This checks if we are building for Cloudflare
+const isCloudflare = process.env.NEXT_PUBLIC_DEPLOY_TARGET === 'cloudflare';
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  /* Keep your existing ignore rules */
   typescript: {
     ignoreBuildErrors: true,
   },
   eslint: {
     ignoreDuringBuilds: true,
   },
+
+  /* Toggle the Static Export based on the environment */
+  output: isCloudflare ? 'export' : undefined,
+
   images: {
+    // This is the key: if Cloudflare, we MUST be unoptimized.
+    // If not Cloudflare (Firebase), we keep normal optimization.
+    unoptimized: isCloudflare,
+    
+    /* Your existing remote patterns stay exactly as they are */
     remotePatterns: [
       {
         protocol: 'https',
