@@ -13,6 +13,7 @@ import {
 import { SimulationPoint } from "@/lib/ozone-logic";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { TrendingUp } from "lucide-react";
+import { useMemo } from "react";
 
 interface ConcentrationChartProps {
   data: SimulationPoint[];
@@ -21,11 +22,22 @@ interface ConcentrationChartProps {
 }
 
 export function ConcentrationChart({ data, safeLimit, dangerousLimit }: ConcentrationChartProps) {
-  const chartData = data.map((d) => ({
-    timeHours: parseFloat((d.time / 60).toFixed(2)),
-    concentration: parseFloat(d.concentration.toFixed(3)),
-    active: d.active ? 1 : 0,
-  }));
+  const { chartData, ticks } = useMemo(() => {
+    const formattedData = data.map((d) => ({
+      timeHours: d.time / 60,
+      concentration: parseFloat(d.concentration.toFixed(3)),
+      active: d.active ? 1 : 0,
+    }));
+
+    const maxHour = formattedData.length > 0 ? formattedData[formattedData.length - 1].timeHours : 0;
+    const tickArray = [];
+    // Generate ticks every 0.5 hours
+    for (let t = 0; t <= Math.ceil(maxHour * 2) / 2; t += 0.5) {
+      tickArray.push(t);
+    }
+
+    return { chartData: formattedData, ticks: tickArray };
+  }, [data]);
 
   return (
     <Card className="shadow-lg border-none bg-white">
@@ -48,9 +60,12 @@ export function ConcentrationChart({ data, safeLimit, dangerousLimit }: Concentr
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted))" />
               <XAxis 
                 dataKey="timeHours" 
+                type="number"
+                domain={[0, 'auto']}
+                ticks={ticks}
+                tickFormatter={(value) => `${value.toFixed(1)}h`}
                 label={{ value: 'Time (h)', position: 'insideBottomRight', offset: -10 }}
                 tick={{ fontSize: 12 }}
-                interval="preserveStartEnd"
               />
               <YAxis 
                 label={{ value: 'mg/m³', angle: -90, position: 'insideLeft' }}
@@ -58,7 +73,7 @@ export function ConcentrationChart({ data, safeLimit, dangerousLimit }: Concentr
               />
               <Tooltip 
                 formatter={(value: number) => [`${value} mg/m³`, 'Concentration']}
-                labelFormatter={(label) => `Time: ${label} h`}
+                labelFormatter={(label: number) => `Time: ${label.toFixed(2)} h`}
                 contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
               />
               <ReferenceLine 
@@ -81,6 +96,7 @@ export function ConcentrationChart({ data, safeLimit, dangerousLimit }: Concentr
                 fillOpacity={1}
                 fill="url(#colorConc)"
                 animationDuration={1500}
+                isAnimationActive={true}
               />
             </AreaChart>
           </ResponsiveContainer>
