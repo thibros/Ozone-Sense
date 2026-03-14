@@ -26,7 +26,7 @@ interface ConcentrationChartProps {
 export function ConcentrationChart({ data, safeLimit, dangerousLimit }: ConcentrationChartProps) {
   const [isLogScale, setIsLogScale] = useState(false);
 
-  const { chartData, ticks } = useMemo(() => {
+  const { chartData, ticks, domainMax } = useMemo(() => {
     const formattedData = data.map((d) => ({
       timeHours: d.time / 60,
       // For log scale, values <= 0 are problematic. We use a tiny epsilon.
@@ -34,14 +34,17 @@ export function ConcentrationChart({ data, safeLimit, dangerousLimit }: Concentr
       active: d.active ? 1 : 0,
     }));
 
-    const maxHour = formattedData.length > 0 ? formattedData[formattedData.length - 1].timeHours : 0;
+    const lastTime = formattedData.length > 0 ? formattedData[formattedData.length - 1].timeHours : 0;
+    
+    // Calculate the domain max as the next half-hour step (e.g. 1.2 -> 1.5, 1.6 -> 2.0)
+    const domainMax = Math.ceil(lastTime * 2) / 2;
+    
     const tickArray = [];
-    // Generate ticks every 0.5 hours
-    for (let t = 0; t <= Math.ceil(maxHour * 2) / 2; t += 0.5) {
+    for (let t = 0; t <= domainMax; t += 0.5) {
       tickArray.push(t);
     }
 
-    return { chartData: formattedData, ticks: tickArray };
+    return { chartData: formattedData, ticks: tickArray, domainMax };
   }, [data]);
 
   return (
@@ -66,7 +69,10 @@ export function ConcentrationChart({ data, safeLimit, dangerousLimit }: Concentr
       <CardContent>
         <div className="h-[400px] w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+            <AreaChart 
+              data={chartData} 
+              margin={{ top: 10, right: 40, left: 0, bottom: 40 }}
+            >
               <defs>
                 <linearGradient id="colorConc" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
@@ -77,17 +83,27 @@ export function ConcentrationChart({ data, safeLimit, dangerousLimit }: Concentr
               <XAxis 
                 dataKey="timeHours" 
                 type="number"
-                domain={[0, 'auto']}
+                domain={[0, domainMax]}
                 ticks={ticks}
                 tickFormatter={(value) => `${value.toFixed(1)}h`}
-                label={{ value: 'Time (h)', position: 'insideBottomRight', offset: -10 }}
-                tick={{ fontSize: 12 }}
+                label={{ 
+                  value: 'Time (h)', 
+                  position: 'insideBottom', 
+                  offset: -25,
+                  style: { fontSize: '12px', fontWeight: 600, fill: 'hsl(var(--muted-foreground))' }
+                }}
+                tick={{ fontSize: 11 }}
               />
               <YAxis 
                 scale={isLogScale ? "log" : "auto"}
                 domain={isLogScale ? [0.01, 'auto'] : [0, 'auto']}
-                label={{ value: 'mg/m³', angle: -90, position: 'insideLeft' }}
-                tick={{ fontSize: 12 }}
+                label={{ 
+                  value: 'mg/m³', 
+                  angle: -90, 
+                  position: 'insideLeft',
+                  style: { fontSize: '12px', fontWeight: 600, fill: 'hsl(var(--muted-foreground))' }
+                }}
+                tick={{ fontSize: 11 }}
                 allowDataOverflow={true}
               />
               <Tooltip 
