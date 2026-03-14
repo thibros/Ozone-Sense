@@ -17,9 +17,10 @@ import { TrendingUp } from "lucide-react";
 interface ConcentrationChartProps {
   data: SimulationPoint[];
   safeLimit: number;
+  dangerousLimit: number;
 }
 
-export function ConcentrationChart({ data, safeLimit }: ConcentrationChartProps) {
+export function ConcentrationChart({ data, safeLimit, dangerousLimit }: ConcentrationChartProps) {
   const chartData = data.map((d) => ({
     timeHours: parseFloat((d.time / 60).toFixed(2)),
     concentration: parseFloat(d.concentration.toFixed(3)),
@@ -47,8 +48,9 @@ export function ConcentrationChart({ data, safeLimit }: ConcentrationChartProps)
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted))" />
               <XAxis 
                 dataKey="timeHours" 
-                label={{ value: 'Time (hours)', position: 'insideBottomRight', offset: -10 }}
+                label={{ value: 'Time (h)', position: 'insideBottomRight', offset: -10 }}
                 tick={{ fontSize: 12 }}
+                interval="preserveStartEnd"
               />
               <YAxis 
                 label={{ value: 'mg/m³', angle: -90, position: 'insideLeft' }}
@@ -59,7 +61,18 @@ export function ConcentrationChart({ data, safeLimit }: ConcentrationChartProps)
                 labelFormatter={(label) => `Time: ${label} h`}
                 contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
               />
-              <ReferenceLine y={safeLimit} label="Safe Limit" stroke="hsl(var(--destructive))" strokeDasharray="3 3" />
+              <ReferenceLine 
+                y={safeLimit} 
+                label={{ value: "Safe", position: "right", fontSize: 10, fill: "hsl(var(--accent))" }} 
+                stroke="hsl(var(--accent))" 
+                strokeDasharray="3 3" 
+              />
+              <ReferenceLine 
+                y={dangerousLimit} 
+                label={{ value: "Danger", position: "right", fontSize: 10, fill: "hsl(var(--destructive))" }} 
+                stroke="hsl(var(--destructive))" 
+                strokeWidth={2}
+              />
               <Area
                 type="monotone"
                 dataKey="concentration"

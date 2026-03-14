@@ -13,9 +13,11 @@ export default function Home() {
   const [rate, setRate] = useState(15000);
   const [halfLife, setHalfLife] = useState(30);
   const [safeLimit, setSafeLimit] = useState(0.2);
+  const [dangerousLimit, setDangerousLimit] = useState(5.0);
   const [schedule, setSchedule] = useState<ScheduleItem[]>([]);
 
   const results = useMemo(() => {
+    // Simulation still runs internally on minutes for precision
     return simulateOzone(volume, rate, halfLife, safeLimit, schedule);
   }, [volume, rate, halfLife, safeLimit, schedule]);
 
@@ -51,6 +53,8 @@ export default function Home() {
               setHalfLife={setHalfLife}
               safeLimit={safeLimit}
               setSafeLimit={setSafeLimit}
+              dangerousLimit={dangerousLimit}
+              setDangerousLimit={setDangerousLimit}
             />
           </div>
           <div className="lg:col-span-4">
@@ -61,7 +65,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Visualization section */}
+        {/* Visualization section - Now full width stacking */}
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
           <div className="flex items-center gap-2 mb-2">
              <div className="h-px bg-primary/10 flex-1" />
@@ -69,9 +73,17 @@ export default function Home() {
              <div className="h-px bg-primary/10 flex-1" />
           </div>
 
-          <section className="flex flex-col gap-8">
-            <ConcentrationChart data={results} safeLimit={safeLimit} />
-            <ConcentrationTable data={results} safeLimit={safeLimit} />
+          <section className="space-y-8">
+            <ConcentrationChart 
+              data={results} 
+              safeLimit={safeLimit} 
+              dangerousLimit={dangerousLimit}
+            />
+            <ConcentrationTable 
+              data={results} 
+              safeLimit={safeLimit} 
+              dangerousLimit={dangerousLimit}
+            />
           </section>
         </div>
 

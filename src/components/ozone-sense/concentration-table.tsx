@@ -16,9 +16,10 @@ import { Table as TableIcon, Info } from "lucide-react";
 interface ConcentrationTableProps {
   data: SimulationPoint[];
   safeLimit: number;
+  dangerousLimit: number;
 }
 
-export function ConcentrationTable({ data, safeLimit }: ConcentrationTableProps) {
+export function ConcentrationTable({ data, safeLimit, dangerousLimit }: ConcentrationTableProps) {
   // Use 30-minute intervals (0.5 hours)
   const intervals = getIntervalPoints(data, 30);
   
@@ -31,10 +32,32 @@ export function ConcentrationTable({ data, safeLimit }: ConcentrationTableProps)
     }
   }
 
-  // Split the intervals into two lists for side-by-side display
+  // Split the intervals into two lists for side-by-side display to maximize space
   const midIndex = Math.ceil(intervals.length / 2);
   const leftColumn = intervals.slice(0, midIndex);
   const rightColumn = intervals.slice(midIndex);
+
+  const StatusBadge = ({ concentration }: { concentration: number }) => {
+    if (concentration >= dangerousLimit) {
+      return (
+        <Badge variant="destructive" className="bg-destructive text-destructive-foreground animate-pulse">
+          Danger
+        </Badge>
+      );
+    }
+    if (concentration > safeLimit) {
+      return (
+        <Badge variant="secondary" className="bg-amber-100 text-amber-800 border-amber-200">
+          Elevated
+        </Badge>
+      );
+    }
+    return (
+      <Badge variant="outline" className="border-accent/50 text-accent font-medium">
+        Safe
+      </Badge>
+    );
+  };
 
   const TableColumn = ({ items }: { items: SimulationPoint[] }) => (
     <div className="rounded-md border border-muted-foreground/10 overflow-hidden h-full">
@@ -50,17 +73,13 @@ export function ConcentrationTable({ data, safeLimit }: ConcentrationTableProps)
           {items.map((point) => (
             <TableRow key={point.time} className="hover:bg-primary/5 transition-colors">
               <TableCell className="font-medium text-muted-foreground">
-                {(point.time / 60).toFixed(1)}
+                {(point.time / 60).toFixed(1)}h
               </TableCell>
               <TableCell className="font-mono text-primary">
                 {point.concentration.toFixed(3)}
               </TableCell>
               <TableCell>
-                {point.concentration <= safeLimit ? (
-                  <Badge variant="outline" className="border-accent/50 text-accent font-medium">Safe</Badge>
-                ) : (
-                  <Badge variant="destructive" className="bg-destructive/10 text-destructive border-destructive/20 font-medium">Elevated</Badge>
-                )}
+                <StatusBadge concentration={point.concentration} />
               </TableCell>
             </TableRow>
           ))}
@@ -92,7 +111,7 @@ export function ConcentrationTable({ data, safeLimit }: ConcentrationTableProps)
         <div className="flex items-start gap-2 p-3 bg-muted/40 rounded-lg">
           <Info className="w-4 h-4 text-primary mt-0.5 shrink-0" />
           <p className="text-xs text-muted-foreground leading-relaxed">
-            The table displays status at 0.5-hour intervals until the environment returns to a safe level ({safeLimit} mg/m³).
+            Logs display status at 0.5-hour intervals until environment returns to safe level ({safeLimit} mg/m³).
           </p>
         </div>
       </CardContent>

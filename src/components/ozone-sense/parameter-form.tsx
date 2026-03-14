@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Wind, Box, Clock, ShieldCheck } from "lucide-react";
+import { Wind, Box, Clock, ShieldCheck, AlertTriangle } from "lucide-react";
 
 interface ParameterFormProps {
   volume: number;
@@ -15,7 +15,13 @@ interface ParameterFormProps {
   setHalfLife: (h: number) => void;
   safeLimit: number;
   setSafeLimit: (s: number) => void;
+  dangerousLimit: number;
+  setDangerousLimit: (d: number) => void;
 }
+
+// Ozone (O3) Molecular weight = 48
+// PPM = (mg/m3 * 24.45) / 48 at 25 degrees Celsius
+const mgToPpm = (mg: number) => ((mg * 24.45) / 48).toFixed(3);
 
 export function ParameterForm({
   volume,
@@ -26,6 +32,8 @@ export function ParameterForm({
   setHalfLife,
   safeLimit,
   setSafeLimit,
+  dangerousLimit,
+  setDangerousLimit,
 }: ParameterFormProps) {
   return (
     <Card className="shadow-lg border-none bg-white/50 backdrop-blur-sm">
@@ -35,7 +43,7 @@ export function ParameterForm({
           Environment Parameters
         </CardTitle>
       </CardHeader>
-      <CardContent className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <CardContent className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         <div className="space-y-2">
           <Label className="flex items-center gap-2">
             <Box className="w-4 h-4 text-primary/70" />
@@ -89,6 +97,26 @@ export function ParameterForm({
             onChange={(e) => setSafeLimit(Number(e.target.value))}
             className="border-primary/20 focus:ring-accent"
           />
+          <p className="text-[10px] text-muted-foreground font-medium pl-1 italic">
+            Reference: {mgToPpm(safeLimit)} ppm @ 25°C
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          <Label className="flex items-center gap-2 text-destructive">
+            <AlertTriangle className="w-4 h-4" />
+            Dangerous Level (mg/m³)
+          </Label>
+          <Input
+            type="number"
+            step="0.1"
+            value={dangerousLimit}
+            onChange={(e) => setDangerousLimit(Number(e.target.value))}
+            className="border-destructive/20 focus:ring-destructive"
+          />
+          <p className="text-[10px] text-muted-foreground font-medium pl-1 italic">
+            Reference: {mgToPpm(dangerousLimit)} ppm @ 25°C
+          </p>
         </div>
       </CardContent>
     </Card>
