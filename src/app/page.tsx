@@ -99,7 +99,7 @@ export default function Home() {
 
         {/* Inputs section */}
         <section className="grid gap-6 lg:grid-cols-12">
-          <div className="lg:col-span-8">
+          <div className="lg:col-span-7">
             <ParameterForm
               volume={volume}
               setVolume={setVolume}
@@ -114,7 +114,7 @@ export default function Home() {
               onReset={handleReset}
             />
           </div>
-          <div className="lg:col-span-4">
+          <div className="lg:col-span-5">
             <ScheduleManager 
               schedule={schedule} 
               setSchedule={setSchedule} 

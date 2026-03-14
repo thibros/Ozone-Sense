@@ -32,7 +32,7 @@ export function ScheduleManager({ schedule, setSchedule }: ScheduleManagerProps)
   };
 
   return (
-    <Card className="shadow-lg border-none bg-white/50 backdrop-blur-sm">
+    <Card className="shadow-lg border-none bg-white/50 backdrop-blur-sm h-full">
       <CardHeader>
         <CardTitle className="flex items-center justify-between text-primary font-headline">
           <div className="flex items-center gap-2">
@@ -45,26 +45,26 @@ export function ScheduleManager({ schedule, setSchedule }: ScheduleManagerProps)
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="flex flex-col sm:flex-row gap-4 items-end">
+        <div className="flex flex-col md:flex-row gap-4 items-end">
           <div className="flex-1 space-y-2 w-full">
-            <Label>Duration (min)</Label>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Duration (min)</Label>
             <Input
               type="number"
               min={1}
               max={180 - totalDuration}
               value={nextDuration}
               onChange={(e) => setNextDuration(Number(e.target.value))}
-              className="border-primary/20"
+              className="border-primary/20 focus:ring-accent w-full"
             />
           </div>
           <div className="flex-1 space-y-2 w-full">
-            <Label>State</Label>
-            <div className="flex gap-2 p-1 bg-muted rounded-md h-10">
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">State</Label>
+            <div className="flex gap-1 p-1 bg-muted rounded-md h-10 border border-primary/5">
               <Button
                 variant={nextType === 'on' ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => setNextType('on')}
-                className="flex-1"
+                className={`flex-1 text-xs h-full transition-all ${nextType === 'on' ? 'shadow-sm' : ''}`}
               >
                 ON
               </Button>
@@ -72,7 +72,7 @@ export function ScheduleManager({ schedule, setSchedule }: ScheduleManagerProps)
                 variant={nextType === 'off' ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => setNextType('off')}
-                className="flex-1"
+                className={`flex-1 text-xs h-full transition-all ${nextType === 'off' ? 'shadow-sm' : ''}`}
               >
                 OFF
               </Button>
@@ -81,7 +81,7 @@ export function ScheduleManager({ schedule, setSchedule }: ScheduleManagerProps)
           <Button 
             onClick={addItem} 
             disabled={totalDuration >= 180}
-            className="w-full sm:w-auto bg-accent hover:bg-accent/90 text-accent-foreground"
+            className="w-full md:w-auto bg-accent hover:bg-accent/90 text-accent-foreground font-semibold px-6"
           >
             <Plus className="w-4 h-4 mr-2" />
             Add State
@@ -90,7 +90,7 @@ export function ScheduleManager({ schedule, setSchedule }: ScheduleManagerProps)
 
         <div className="space-y-2">
           {schedule.length === 0 ? (
-            <p className="text-center text-muted-foreground py-8 border-2 border-dashed rounded-lg bg-muted/30">
+            <p className="text-center text-muted-foreground py-10 border-2 border-dashed rounded-lg bg-muted/30 text-sm">
               No states added. Ozonator is off by default.
             </p>
           ) : (
@@ -105,12 +105,12 @@ export function ScheduleManager({ schedule, setSchedule }: ScheduleManagerProps)
                   }`}
                 >
                   {item.type === 'on' ? <Power className="w-4 h-4" /> : <PowerOff className="w-4 h-4" />}
-                  <span className="text-sm font-medium">{item.duration}m</span>
+                  <span className="text-sm font-bold">{item.duration}m</span>
                   <button
                     onClick={() => removeItem(index)}
-                    className="p-1 hover:text-destructive transition-colors"
+                    className="p-1.5 rounded-full hover:bg-destructive/10 hover:text-destructive transition-colors"
                   >
-                    <Trash2 className="w-3 h-3" />
+                    <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
               ))}
