@@ -2,7 +2,7 @@ import type {Metadata} from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'OzoneSense | Ozone Concentration Calculator',
+  title: 'OzoneSense | Honkapuro Ozone Concentration Calculator',
   description: 'Calculate ozone concentration in enclosed spaces with precise modeling and scheduling.',
 };
 
